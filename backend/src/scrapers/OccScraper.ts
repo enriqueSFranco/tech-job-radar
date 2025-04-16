@@ -1,7 +1,7 @@
 import { chromium } from "playwright";
 import { slugify } from "../utils/slugify";
 
-const OCC_BASE_URL = new URL("https://www.occ.com.mx/");
+const baseUrl = new URL(`${process.env.OCC_BASE_URL}`);
 
 type Job = {
   id: string;
@@ -32,7 +32,7 @@ const SEARCH_INPUT = {
   const context = await browser.newContext();
   try {
     const page = await context.newPage();
-    await page.goto(OCC_BASE_URL.toString());
+    await page.goto(baseUrl.toString());
 
     // Seleccionar el input de búsqueda por palabra clave (puesto, área laboral o empresa)
     const keywordInput = page.getByTestId("search-box-keyword");
@@ -54,7 +54,7 @@ const SEARCH_INPUT = {
     await buttonSearch.click();
 
     const expectedPath = `empleos/de-${keywordSlug}/en-${locationSlug}/`;
-    const expectedUrl = new URL(expectedPath, OCC_BASE_URL).toString();
+    const expectedUrl = new URL(expectedPath, baseUrl).toString();
     console.log({ keywordSlug, locationSlug, expectedPath, expectedUrl });
 
     await page.waitForURL(expectedUrl, { waitUntil: "load" });
