@@ -19,14 +19,14 @@ type Job = {
   salary?: string;
 };
 
-const jobs: Job[] = [];
+const jobs: Job[] = []
 
 // TODO: Implementar busqueda dinamica
 const SEARCH_INPUT = {
   KEYWORD: "frontend developer",
   LOCATION: "Ciudad de México",
 };
-// await page.waitForURL("**/login");
+
 (async () => {
   const browser = await chromium.launch();
   const context = await browser.newContext();
@@ -60,57 +60,25 @@ const SEARCH_INPUT = {
     await page.waitForURL(expectedUrl, { waitUntil: "load" });
 
     await page.waitForTimeout(3000);
-    const cards = page.locator("//div[starts-with(@id, 'jobcard-')]");
-    const cardslist = await cards.all();
+    const cardLocator = page.locator("//div[starts-with(@id, 'jobcard-')]");
 
-    for (const card of cardslist) {
-      // Scroll al elemento (útil si es lazy-loaded)
-      await card.scrollIntoViewIfNeeded();
+    const jobData = await cardLocator.evaluateAll((cards) => {
+      return cards.map(card => {
+        const $titleEle = card.querySelector("h2")
+        const title = $titleEle?.textContent?.trim() ?? "⚠️ No se pudo recuperar el título";
 
-      const previousTitle = await page
-        .locator("#job-detail-container div.mt-2 > p")
-        .textContent()
-        .catch(() => "");
-
-      try {
-        await Promise.all([
-          card.click(),
-          page.waitForFunction(
-            (prev) => {
-              const el = document.querySelector(
-                "#job-detail-container div.mt-2 > p"
-              );
-              return el?.textContent?.trim() && el.textContent.trim() !== prev;
-            },
-            previousTitle,
-            { timeout: 3000 }
-          ),
-        ]);
-      } catch (error) {
-        console.warn(
-          "⚠️ No cambió el título, intentando extraer de todas formas..."
-        );
-      }
-
-      const jobTitleLocator = page.locator(
-        "#job-detail-container div.mt-2 > p"
-      );
-      const jobTitle = await jobTitleLocator.first().textContent();
-      if (jobTitle) {
-        const newJob: Job = {
-          id: crypto.randomUUID(),
-          title: jobTitle
-        }
-        jobs.push(newJob);
-      } else {
-        console.log("⚠️ No se pudo obtener el título de este empleo");
-      }
+        const $companyEle = card.querySelector("a[href*='/empleos/bolsa-de-trabajo-']");
+        const company =
+          $companyEle?.textContent?.trim() ??
+          "⚠️ Empresa confidencial";
+        return {id: crypto.randomUUID(),title, company}
+      })
+    });
+    jobs.push(...jobData);
+    console.log({ jobs });
+    } catch (err) {
+      console.error("Error:", err);
+    } finally {
+      await context.close();
     }
-    // await page.screenshot({path:"src/empleos.png"})
-    console.log(jobs);
-  } catch (err) {
-    console.error("Error:", err);
-  } finally {
-    await context.close();
-  }
 })();
