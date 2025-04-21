@@ -1,0 +1,16 @@
+.debugger {
+  position: fixed;
+  top: 4;
+  left: 4;
+  overflow-y: auto;
+  background-color: black;
+  padding: 16px;
+  border-radius: 4px;
+  border: 1px solid #eee;
+  backdrop-filter: 8px;
+}
+
+.debugger_text {
+  font-size: 14px;
+
+}
