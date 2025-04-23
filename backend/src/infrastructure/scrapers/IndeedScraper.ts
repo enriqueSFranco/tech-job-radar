@@ -24,7 +24,7 @@ card: div.class="cardOutline job_916363f3fe8bc11d"
 import { chromium } from "playwright";
 import type { Page, Browser, BrowserContext } from "playwright";
 import { AppError } from "../../shared/AppError";
-import { JobDTO } from "../../dtos/job.dto";
+import { JobDTO } from "../../models/job.model";
 import { slugify } from "../../shared/slugify";
 
 interface SearchParams {
