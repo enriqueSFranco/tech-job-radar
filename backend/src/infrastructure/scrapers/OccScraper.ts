@@ -1,51 +1,15 @@
 import { chromium, Page, Browser, BrowserContext, Locator } from "playwright";
-import { JobDTO } from "../../dtos/job.dto";
+import { Job } from "../../models/job.model";
 import { AppError } from "../../shared/AppError";
 import { slugify } from "../../shared/slugify";
+import { BaseScraper, SearchParams } from "./BaseScraper";
 
-/**
- * Parámetros para realizar la búsqueda de trabajos.
- * @typedef {Object} SearchParams
- * @property {string} keyword - Palabra clave de búsqueda.
- * @property {string} location - Ubicación de la búsqueda.
- */
-interface SearchParams {
-  keyword: string;
-  location: string;
-}
-
-abstract class BaseScraper {
-  // común para todos los scrapers
-  protected abstract url: string;
-  protected searchParams: SearchParams = { keyword: "", location: "" };
-
-  async scrape(): Promise<JobDTO[]> {
-    await this.init();
-
-    await this.search(this.searchParams);
-    const jobs = await this.extractJobs();
-
-    await this.close();
-    return jobs;
-  }
-
-  protected abstract init(): Promise<void>;
-  protected abstract close(): Promise<void>;
-  protected abstract search(params: SearchParams): Promise<void>;
-  protected abstract extractJobs(): Promise<JobDTO[]>;
-  protected extractPaginationNumbers?(): Promise<{
-    minPage: number;
-    maxPage: number;
-  }> {
-    return Promise.resolve({ minPage: 1, maxPage: 1 });
-  }
-}
 
 export class OccScraper extends BaseScraper {
   private browser!: Browser;
   private context!: BrowserContext;
   private page!: Page;
-  private jobs: JobDTO[] = [];
+  private jobs: Job[] = [];
   protected url = `${process.env.OCC_BASE_URL}`;
 
   /**
@@ -110,10 +74,10 @@ export class OccScraper extends BaseScraper {
   /**
    * Realiza el scraping de trabajos desde el sitio de OCC.
    * Incluye paginación.
-   * @returns {Promise<JobDTO[]>} Lista de trabajos encontrados.
+   * @returns {Promise<Job[]>} Lista de trabajos encontrados.
    * @throws {AppError} Si ocurre un error durante el scraping.
    */
-  public async scrape(): Promise<JobDTO[]> {
+  public async scrape(): Promise<Job[]> {
     try {
       const { maxPage } = await this.extractPaginationNumbers();
 
@@ -176,9 +140,9 @@ export class OccScraper extends BaseScraper {
   /**
    * Extrae los datos de los trabajos en la página actual.
    * @private
-   * @returns {Promise<JobDTO[]>} Lista de trabajos extraídos.
+   * @returns {Promise<Job[]>} Lista de trabajos extraídos.
    */
-  protected async extractJobs(): Promise<JobDTO[]> {
+  protected async extractJobs(): Promise<Job[]> {
     const jobCards = this.page.locator("//div[starts-with(@id, 'jobcard-')]");
     return jobCards.evaluateAll((cards) => {
       return cards.map((card) => {
