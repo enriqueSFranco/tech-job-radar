@@ -1,5 +1,13 @@
 import type { Job } from "@/domain/jobs/types";
-import styles from "./Card.module.css"
+import styles from "./Card.module.css";
+import {
+  IcBriefCase,
+  IcDollar,
+  IcHomeWork,
+  IcLocation,
+  IcOffice,
+  IcUser,
+} from "../icons/Icon";
 
 interface Props {
   data: Job;
@@ -21,32 +29,37 @@ export function Card({ data, recommendedVacancy }: Props) {
     details,
   } = data;
 
-  const cardClassName = recommendedVacancy ? styles.recommendedCard : styles.regularCard
+  const cardClassName = recommendedVacancy
+    ? styles.recommendedCard
+    : "p-4 flex flex-col justify-bwetween gap-2 w-full h-[200px] bg-white/5";
   const infoList = [
-    {icon: '', text: location},
-    {icon: '', text: type},
-    {icon: '', text: salary},
-    {icon: '', text: experience_level},
-    {icon: '', text: remote},
-  ]
+    { icon: <IcBriefCase />, text: type },
+    { icon: <IcUser />, text: experience_level },
+    {
+      icon: false ? <IcHomeWork /> : <IcOffice />,
+      text: false ? "home" : "office",
+    },
+    { icon: <IcDollar />, text: salary },
+    { icon: <IcLocation />, text: location, colSpan: 2 },
+  ];
   return (
-    <article className={cardClassName}>
-      <header className={styles.header}>
-        <div className={styles.titleBlock}>
-          <h2 className={styles.title}>{title}</h2>
-          <h3 className={styles.company}>{company}</h3>
-        </div>
-        <span className={styles.date}>{posted_date}</span>
+    <article className={`${cardClassName}`}>
+      <header className="flex items-center justify-between text-sm">
+        <label className="text-gray-400 text-sm font-light">{posted_date}</label>
       </header>
-      <div className={styles.details}>
-        <p>{details ?? "No hay detalles para esta vacante"}</p>
+      <div className="flex flex-col gap-1.5 justify-start items-start tracking-wide">
+        <h2 className="font-bold text-lg">{title}</h2>
+        <span className="font-light text-sm">{salary}</span>
       </div>
-      <footer className={styles.footer}>
-        <ul className={styles.infoList}>
-          {infoList.map(item => (
-            <li key={`item-${item.text}`} className={styles.infoItem}><span>{item.text}</span></li>
-          ))}
-        </ul>
+      {details && (
+        <div className={styles.details}>
+          <p>{details}</p>
+        </div>
+      )}
+
+      <footer className="flex flex-col items-start">
+        <span>{company}</span>
+        <span>{location}</span>
       </footer>
     </article>
   );
