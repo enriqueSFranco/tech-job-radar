@@ -1,5 +1,3 @@
-import styles from "./Debugger.module.css"
-
 interface DebuggerProps {
   data: any;
 }
@@ -32,8 +30,8 @@ export const Debugger: React.FC<DebuggerProps> = ({ data }) => {
   };
 
   return (
-    <div className={styles.debugger}>
-      <pre className={styles.debugger_text}>{renderData(data)}</pre>
+    <div className="fixed top-4 left-4 overflow-y-auto rounded-lg bg-black/20 outline outline-[1px] whitespace-pre-wrap outline-white/20 p-3 text-left opacity-95 backdrop-blur-sm">
+      <pre className="text-sm opacity-80">{renderData(data)}</pre>
     </div>
   );
 };
