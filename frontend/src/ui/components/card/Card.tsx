@@ -1,56 +1,82 @@
 import type { Job } from "@/types";
-import styles from "./Card.module.css";
-// import {
-//   IcBriefCase,
-//   IcDollar,
-//   IcHomeWork,
-//   IcLocation,
-//   IcOffice,
-//   IcUser,
-// } from "../icons";
+import { IcBookMark, IcOffice } from "../icons";
+import { Link } from "react-router";
+import { IcGlassdoor } from "../icons/business/IcGlassdoor";
+import { IcOcc } from "../icons/business/IcOcc";
 
 interface Props {
-  data: Job;
+  item: Job;
   recommendedVacancy?: boolean;
+  onSaveJob(): void;
+  isSave: boolean;
 }
 
-export function Card({ data, recommendedVacancy }: Props) {
-  const {
-    title,
-    location,
-    type,
-    salary,
-    posted_date,
-    experience_level,
-    company,
-    remote,
-    educations,
-    technologies,
-    details,
-  } = data;
-
+export function Card({ item, recommendedVacancy, onSaveJob, isSave }: Props) {
   const cardClassName = recommendedVacancy
-    ? styles.recommendedCard
-    : "p-4 flex flex-col justify-bwetween gap-2 w-full h-[200px] bg-white/5";
+    ? ""
+    : "p-2 flex flex-col justify-bwetween gap-2 w-[450px] h-[200px] bg-white/5";
+
+  // const iconModalityWork = item.isRemote ? <IcHomeWork /> : <IcOffice />;
+  const applicationUrlHost = new URL(item.applicationUrl).host;
+  const siteName = applicationUrlHost.split(".")[1];
+  const buttonBackgroundColor = siteName.includes("occ") ? "#0A3CAD59" : "#00A26340";
+  const siteIcon = siteName.includes("occ") ? <IcOcc /> : <IcGlassdoor />;
 
   return (
     <article className={`${cardClassName}`}>
-      <header className="flex items-center justify-between text-sm">
-        <label className="text-gray-400 text-sm font-light">{posted_date}</label>
+      <header className="flex items-start justify-between text-sm">
+        <div className="flex flex-col items-start justify-start gap-2">
+          <h2 className="font-bold text-lg tracking-wide">{item.jobTitle}</h2>
+          <div className="flex items-center justify-start gap-1">
+            <div className="flex items-center gap-1.5">
+              <IcOffice />
+              <h3 className="text-sm text-gray-400 self-end">
+                {item.companyName}
+              </h3>
+            </div>
+            <span className="text-gray-500">&#9679;</span>
+            <h3 className="text-sm text-gray-400 self-end">{item.jobLocation}</h3>
+          </div>
+        </div>
+        <button onClick={onSaveJob} className="cursor-pointer" title={isSave ? "Quitar de guardados" : "Guardar"}>
+          <IcBookMark className={isSave ? "fill-white" : "stroke-gray-500"} />
+        </button>
       </header>
-      <div className="flex flex-col gap-1.5 justify-start items-start tracking-wide">
-        <h2 className="font-bold text-lg">{title}</h2>
-        <span className="font-light text-sm">{salary}</span>
-      </div>
-      {details && (
-        <div className="">
-          <p>{details}</p>
+      <div>
+          <ul className="flex items-center flex-wrap gap-2">
+            <li>
+              <div className="flex items-center gap-1.5 bg-gray-500/20 px-2 py-1 rounded-full">
+                {/* {iconModalityWork} */}
+                <h3 className="text-sm text-gray-400 self-end">{item.isRemote ? "Desde casa" : "En oficina"}</h3>
+              </div>
+            </li>
+            <li>
+              <div className="flex items-center gap-1.5 bg-gray-500/20 px-2 py-1 rounded-full">
+                {/* {iconModalityWork} */}
+                <h3 className="text-sm text-gray-400 self-end">{item.employmentType}</h3>
+              </div>
+            </li>
+          </ul>
+        </div>
+      {item.jobDescription && (
+        <div className="grow">
+          <p className="text-balance text-sm text-left text-gray-300 tracking-wide">
+            {item.jobDescription}
+          </p>
         </div>
       )}
-
-      <footer className="flex flex-col items-start">
-        <span>{company}</span>
-        <span>{location}</span>
+      <footer className="flex items-start justify-between">
+        <label className="text-gray-400 text-sm font-light">
+          {item.datePosted}
+        </label>
+        <Link
+          to={item.applicationUrl}
+          style={{backgroundColor: buttonBackgroundColor}}
+          className="px-4 py-2 rounded-xs text-base font-light flex items-center gap-1"
+        >
+          Ir a
+          {siteIcon}
+        </Link>
       </footer>
     </article>
   );
