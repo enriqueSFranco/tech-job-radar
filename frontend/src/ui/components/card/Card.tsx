@@ -3,6 +3,7 @@ import { IcBookMark, IcOffice } from "../icons";
 import { Link } from "react-router";
 import { IcGlassdoor } from "../icons/business/IcGlassdoor";
 import { IcOcc } from "../icons/business/IcOcc";
+import { Badge } from "@/shared/components/Badge/Badge";
 
 interface Props {
   item: Job;
@@ -45,16 +46,10 @@ export function Card({ item, recommendedVacancy, onSaveJob, isSave }: Props) {
       <div>
           <ul className="flex items-center flex-wrap gap-2">
             <li>
-              <div className="flex items-center gap-1.5 bg-gray-500/20 px-2 py-1 rounded-full">
-                {/* {iconModalityWork} */}
-                <h3 className="text-sm text-gray-400 self-end">{item.isRemote ? "Desde casa" : "En oficina"}</h3>
-              </div>
+              <Badge label={item.isRemote ? "Desde casa" : "En oficina"} />
             </li>
             <li>
-              <div className="flex items-center gap-1.5 bg-gray-500/20 px-2 py-1 rounded-full">
-                {/* {iconModalityWork} */}
-                <h3 className="text-sm text-gray-400 self-end">{item.employmentType}</h3>
-              </div>
+              <Badge label={item.employmentType} />
             </li>
           </ul>
         </div>
