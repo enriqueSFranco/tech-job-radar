@@ -1,15 +1,16 @@
-import { chromium, Page, Browser, BrowserContext, Locator } from "playwright";
+import { chromium, Page, Browser, BrowserContext } from "playwright";
 import { Job } from "../../models/job.model";
 import { AppError } from "../../shared/AppError";
 import { slugify } from "../../shared/slugify";
 import { SearchParams } from "./types";
+import { OCC_BASE_URL } from "../../config/environment";
 
 export class OccScraper {
   private browser!: Browser;
   private context!: BrowserContext;
   private page!: Page;
   private jobs: Job[] = [];
-  protected url = `${process.env.OCC_BASE_URL}`;
+  protected url = new URL(`${OCC_BASE_URL}`);
 
   /**
    * Inicializa el navegador y la página con Playwright.
@@ -86,6 +87,22 @@ export class OccScraper {
     }
   }
 
+  private async scrapePaginatedResults(maxPage: number): Promise<void> {
+    for (let page = 1; page <= maxPage; page++) {
+      if (page > 1) {
+        const paginatedUrl = new URL(this.page.url());
+        paginatedUrl.searchParams.set("page", page.toString());
+        console.log(`📄 Navegando a página ${page}: ${paginatedUrl}`);
+        await this.page.goto(paginatedUrl.toString(), { waitUntil: "load" });
+        await this.page.waitForTimeout(3000);
+      }
+
+      console.log(`📦 Extrayendo datos de página ${page}...`);
+      const newJobs = await this.extractJobs();
+      this.jobs.push(...newJobs);
+    }
+  }
+
   /**
    * Realiza el scraping de trabajos desde el sitio de OCC.
    * Incluye paginación.
@@ -95,19 +112,11 @@ export class OccScraper {
   public async scrape(): Promise<Job[]> {
     try {
       const { maxPage } = await this.extractPaginationNumbers();
-
-      for (let page = 1; page <= maxPage; page++) {
-        if (page > 1) {
-          const paginatedUrl = new URL(this.page.url());
-          paginatedUrl.searchParams.set("page", page.toString());
-          console.log(`📄 Navegando a página ${page}: ${paginatedUrl}`);
-          await this.page.goto(paginatedUrl.toString(), { waitUntil: "load" });
-          await this.page.waitForTimeout(3000);
-        }
-
-        console.log(`📦 Extrayendo datos de página ${page}...`);
+      if (maxPage === 1) {
         const newJobs = await this.extractJobs();
         this.jobs.push(...newJobs);
+      } else {
+        await this.scrapePaginatedResults(maxPage);
       }
 
       console.log(
