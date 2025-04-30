@@ -6,7 +6,7 @@ export function IcHomeWork() {
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-     width={24}
+     width={20}
     >
       <path
         strokeLinecap="round"

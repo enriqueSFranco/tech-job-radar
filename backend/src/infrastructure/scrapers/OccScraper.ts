@@ -1,16 +1,16 @@
-import { chromium, Page, Browser, BrowserContext, Locator } from "playwright";
+import { chromium, Page, Browser, BrowserContext } from "playwright";
 import { Job } from "../../models/job.model";
 import { AppError } from "../../shared/AppError";
 import { slugify } from "../../shared/slugify";
-import { BaseScraper, SearchParams } from "./BaseScraper";
+import { SearchParams } from "./types";
+import { OCC_BASE_URL } from "../../config/environment";
 
-
-export class OccScraper extends BaseScraper {
+export class OccScraper {
   private browser!: Browser;
   private context!: BrowserContext;
   private page!: Page;
   private jobs: Job[] = [];
-  protected url = `${process.env.OCC_BASE_URL}`;
+  protected url = new URL(`${OCC_BASE_URL}`);
 
   /**
    * Inicializa el navegador y la página con Playwright.
@@ -20,7 +20,7 @@ export class OccScraper extends BaseScraper {
   public async init(): Promise<void> {
     try {
       console.log("🚀 Iniciando navegador...");
-      this.browser = await chromium.launch();
+      this.browser = await chromium.launch({ headless: false });
       this.context = await this.browser.newContext();
       this.page = await this.context.newPage();
     } catch (err) {
@@ -36,38 +36,70 @@ export class OccScraper extends BaseScraper {
    */
   public async search({ keyword, location }: SearchParams): Promise<void> {
     try {
-      console.log(`🔍 Buscando trabajos para: "${keyword}" en "${location}"`);
-      await this.page.goto(this.url.toString());
+      const normalizedKeyword = keyword.toLowerCase();
+      const normalizedLocation = location.toLowerCase();
 
-      await this.page.getByTestId("search-box-keyword").fill(keyword);
-      await this.page.getByTestId("search-box-location").fill(location);
-
-      const stateSelector = await this.page.waitForSelector(
-        'h5:has-text("Estados")'
+      console.log(
+        `🔍 Buscando trabajos para: "${normalizedKeyword}" en "${normalizedLocation}"`
       );
-      await stateSelector.waitForElementState("visible");
-      await this.page.click(`li:has-text("${location}")`);
+      await this.page.goto(this.url.toString(), {
+        waitUntil: "domcontentloaded",
+      });
 
+      // Llenar los campos de búsqueda
+      await this.page.getByTestId("search-box-keyword").fill(normalizedKeyword);
+      await this.page
+        .getByTestId("search-box-location")
+        .fill(normalizedLocation);
+
+      // Esperar el dropdown y seleccionar la primera opción
+      await this.page.waitForSelector("div.shadow-dropdown ul > li", {
+        timeout: 5000,
+      });
+      const firstLocationOption = this.page
+        .locator("div.shadow-dropdown ul > li")
+        .first();
+
+      const optionText = await firstLocationOption.textContent();
+      console.log("🧭 Opción de ubicación seleccionada:", optionText?.trim());
+
+      await firstLocationOption.click();
+
+      // Hacer clic en el botón de búsqueda
       await this.page.getByTestId("search-box-submit").click();
 
-      const expectedPath = `empleos/de-${slugify(keyword)}/en-${slugify(
-        location
-      )}/`;
+      // Esperar redirección a URL con resultados
+      const expectedPath = `empleos/de-${slugify(
+        normalizedKeyword
+      )}/en-${slugify(normalizedLocation)}/`;
       const expectedUrl = new URL(expectedPath, this.url).toString();
 
       console.log(`📡 Esperando redirección a resultados: ${expectedUrl}`);
-      await this.page.waitForURL(expectedUrl, { waitUntil: "load" });
-      await this.page.waitForTimeout(3000);
+      await this.page.waitForURL(expectedUrl, { waitUntil: "networkidle" });
+
+      console.log(`🔗 current url: ${this.page.url()}`);
     } catch (err) {
       const error =
         err instanceof Error
-          ? new AppError(
-              `Fallo en la búsqueda: ${(err as Error).message}`,
-              400,
-              true
-            )
+          ? new AppError(`Fallo en la búsqueda: ${err.message}`, 400, true)
           : new Error("Unknown error");
       throw error;
+    }
+  }
+
+  private async scrapePaginatedResults(maxPage: number): Promise<void> {
+    for (let page = 1; page <= maxPage; page++) {
+      if (page > 1) {
+        const paginatedUrl = new URL(this.page.url());
+        paginatedUrl.searchParams.set("page", page.toString());
+        console.log(`📄 Navegando a página ${page}: ${paginatedUrl}`);
+        await this.page.goto(paginatedUrl.toString(), { waitUntil: "load" });
+        await this.page.waitForTimeout(3000);
+      }
+
+      console.log(`📦 Extrayendo datos de página ${page}...`);
+      const newJobs = await this.extractJobs();
+      this.jobs.push(...newJobs);
     }
   }
 
@@ -80,19 +112,11 @@ export class OccScraper extends BaseScraper {
   public async scrape(): Promise<Job[]> {
     try {
       const { maxPage } = await this.extractPaginationNumbers();
-
-      for (let page = 1; page <= maxPage; page++) {
-        if (page > 1) {
-          const paginatedUrl = new URL(this.page.url());
-          paginatedUrl.searchParams.set("page", page.toString());
-          console.log(`📄 Navegando a página ${page}: ${paginatedUrl}`);
-          await this.page.goto(paginatedUrl.toString(), { waitUntil: "load" });
-          await this.page.waitForTimeout(3000);
-        }
-
-        console.log(`📦 Extrayendo datos de página ${page}...`);
+      if (maxPage === 1) {
         const newJobs = await this.extractJobs();
         this.jobs.push(...newJobs);
+      } else {
+        await this.scrapePaginatedResults(maxPage);
       }
 
       console.log(
@@ -100,6 +124,9 @@ export class OccScraper extends BaseScraper {
       );
       return this.jobs;
     } catch (err) {
+      await this.page.screenshot({
+        path: "./src/screenshots/scrape-debug.png",
+      });
       const error =
         err instanceof Error
           ? new AppError(
@@ -121,7 +148,9 @@ export class OccScraper extends BaseScraper {
     minPage: number;
     maxPage: number;
   }> {
-    await this.page.waitForSelector('//div[contains(@class, "mt-6")]//ul');
+    await this.page.waitForSelector('//div[contains(@class, "mt-6")]//ul', {
+      state: "visible",
+    });
     const items = this.page.locator('//div[contains(@class, "mt-6")]//ul/li');
 
     const pageNumbers = await items.evaluateAll((nodes) =>
