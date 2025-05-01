@@ -15,7 +15,7 @@ interface Props {
 export function Card({ item, recommendedVacancy, onSaveJob, isSave }: Props) {
   const cardClassName = recommendedVacancy
     ? ""
-    : "p-2 flex flex-col justify-bwetween gap-2 w-[450px] h-[200px] bg-white/5";
+    : "p-2 flex flex-col justify-bwetween gap-2 h-[200px] bg-white/5";
 
   // const iconModalityWork = item.isRemote ? <IcHomeWork /> : <IcOffice />;
   const applicationUrlHost = new URL(item.applicationUrl).host;

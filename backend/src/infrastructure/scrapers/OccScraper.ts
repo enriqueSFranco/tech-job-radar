@@ -21,8 +21,16 @@ export class OccScraper {
     try {
       console.log("🚀 Iniciando navegador...");
       this.browser = await chromium.launch({ headless: false });
-      this.context = await this.browser.newContext();
+      this.context = await this.browser.newContext({
+        userAgent:
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/123.0 Safari/537.36",
+        viewport: { width: 1366, height: 768 },
+        locale: "es-MX",
+      });
       this.page = await this.context.newPage();
+      this.page.addInitScript(() => {
+        Object.defineProperty(navigator, "webdriver", {get: () => false})
+      })
     } catch (err) {
       throw new AppError("Fallo al inicializar Playwright", 500, true);
     }
@@ -47,10 +55,16 @@ export class OccScraper {
       });
 
       // Llenar los campos de búsqueda
-      await this.page.getByTestId("search-box-keyword").fill(normalizedKeyword);
+      await this.page
+        .getByTestId("search-box-keyword")
+        .fill(normalizedKeyword, {
+          timeout: Math.floor(Math.random() * (200 - 100 + 1)) + 100,
+        });
       await this.page
         .getByTestId("search-box-location")
-        .fill(normalizedLocation);
+        .fill(normalizedLocation, {
+          timeout: Math.floor(Math.random() * (100 - 200 + 1)) + 200,
+        });
 
       // Esperar el dropdown y seleccionar la primera opción
       await this.page.waitForSelector("div.shadow-dropdown ul > li", {
