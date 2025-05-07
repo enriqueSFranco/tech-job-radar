@@ -24,10 +24,10 @@ export function Card({ item, recommendedVacancy, onSaveJob, isSave }: Props) {
   const siteIcon = siteName.includes("occ") ? <IcOcc /> : <IcGlassdoor />;
 
   return (
-    <article className={`${cardClassName}`}>
+    <article className={`${cardClassName}`} aria-labelledby={`job-title-${item.id}`} role="region">
       <header className="flex items-start justify-between text-sm">
         <div className="flex flex-col items-start justify-start gap-2">
-          <h2 className="font-bold text-lg tracking-wide">{item.jobTitle}</h2>
+          <h2 id={`job-title-${item.id}`} className="font-bold text-lg tracking-wide">{item.jobTitle}</h2>
           <div className="flex items-center justify-start gap-1">
             <div className="flex items-center gap-1.5">
               <IcOffice />
@@ -39,11 +39,11 @@ export function Card({ item, recommendedVacancy, onSaveJob, isSave }: Props) {
             <h3 className="text-sm text-gray-400 self-end">{item.jobLocation}</h3>
           </div>
         </div>
-        <button onClick={onSaveJob} className="cursor-pointer" title={isSave ? "Quitar de guardados" : "Guardar"}>
+        <button onClick={onSaveJob} className="cursor-pointer" aria-label={isSave ? "Quitar este emplo de guardados" : "Guardar estem empleo"} title={isSave ? "Quitar de guardados" : "Guardar"} aria-pressed={isSave}>
           <IcBookMark className={isSave ? "fill-white" : "stroke-gray-500"} />
         </button>
       </header>
-      <div>
+      <div role="group" aria-label="Etiquetas del empleo" className="mt-2">
           <ul className="flex items-center flex-wrap gap-2">
             <li>
               <Badge label={item.isRemote ? "Desde casa" : "En oficina"} />
@@ -66,8 +66,11 @@ export function Card({ item, recommendedVacancy, onSaveJob, isSave }: Props) {
         </label>
         <Link
           to={item.applicationUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Ir a la aplicación en ${new URL(item.applicationUrl).hostname}`}
           style={{backgroundColor: buttonBackgroundColor}}
-          className="px-4 py-2 rounded-xs text-base font-light flex items-center gap-1"
+          className="px-4 py-2 rounded-xs text-base font-light flex items-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
         >
           Ir a
           {siteIcon}
