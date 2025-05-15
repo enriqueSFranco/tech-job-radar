@@ -24,7 +24,7 @@ card: div.class="cardOutline job_916363f3fe8bc11d"
 import { chromium } from "playwright";
 import type { Page, Browser, BrowserContext } from "playwright";
 import { AppError } from "../../shared/AppError";
-import { JobDTO } from "../../models/job.model";
+import { Job } from "../../models/job.model";
 import { slugify } from "../../shared/slugify";
 
 interface SearchParams {
@@ -33,7 +33,7 @@ interface SearchParams {
 }
 
 class IndeedScraper {
-  private jobs: JobDTO[] = [];
+  private jobs: Job[] = [];
   private browser!: Browser;
   private context!: BrowserContext;
   private page!: Page;
@@ -86,7 +86,7 @@ class IndeedScraper {
     }
   }
 
-  public async scrape(): Promise<JobDTO[]> {
+  public async scrape(): Promise<Job[]> {
     try {
       const { maxPage } = await this.extractPaginationNumbers();
 
@@ -142,7 +142,7 @@ class IndeedScraper {
     return { minPage, maxPage };
   }
 
-  private async extractJobs(): Promise<JobDTO[]> {
+  private async extractJobs(): Promise<Job[]> {
     const jobCards = this.page.locator("//div[starts-with(@id, 'jobcard-')]");
     return jobCards.evaluateAll((cards) => {
       return cards.map((card) => {
