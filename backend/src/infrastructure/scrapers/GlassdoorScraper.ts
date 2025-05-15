@@ -1,7 +1,7 @@
 import { Browser, BrowserContext, Locator, Page, chromium } from "playwright";
 import { Job } from "../../models/job.model";
 import { AppError } from "../../shared/AppError";
-import { BaseScraper, SearchParams } from "./BaseScraper";
+import { SearchParams } from "./types";
 /*
 selectores
   search form
@@ -19,7 +19,7 @@ selectores
 
 */
 
-class GlassdoorScraper extends BaseScraper {
+class GlassdoorScraper {
   private browser!: Browser;
   private context!: BrowserContext;
   private page!: Page;
@@ -33,48 +33,76 @@ class GlassdoorScraper extends BaseScraper {
       this.context = await this.browser.newContext({
         userAgent:
           "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        viewport: { width: 1280, height: 800 },
       });
       this.page = await this.context.newPage();
+      await this.page.route("**/*.{png,jpg,jpeg,gif,svg,woff2}", (route) =>
+        route.abort()
+      );
+      if (!this.url) {
+        throw new AppError("La URL de Glassdoor no está definida", 500);
+      }
+      console.log("🌐 Navegando a:", this.url);
       await this.page.goto(this.url.toString(), {
         waitUntil: "domcontentloaded",
       });
+      console.log("✅ Página cargada");
     } catch (err) {
       throw new AppError("Fallo al inicializar Playwright", 500, true);
     }
   }
 
   async search({ keyword, location }: SearchParams): Promise<void> {
+    if (!keyword.trim() || !location.trim()) {
+      throw new AppError("Keyword y location son obligatorios", 400, true);
+    }
+
+    console.log(`🔍 Buscando trabajos para: "${keyword}" en "${location}"`);
     try {
       // Glassdoor está bloqueando al scraper (por User-Agent, IP o headless mode)
-      console.log(`🔍 Buscando trabajos para: "${keyword}" en "${location}"`);
       await this.page.goto(this.url.toString(), { waitUntil: "networkidle" });
 
       const keywordInput = this.page.locator("#searchBar-jobTitle");
       const locationInput = this.page.locator("#searchBar-location");
+      // verificamos que existan los inputs
+      await Promise.all([
+        keywordInput.waitFor({ state: "visible", timeout: 500 }),
+        locationInput.waitFor({ state: "visible", timeout: 500 }),
+      ]);
+      await keywordInput.fill("");
       await keywordInput.fill(keyword);
+
+      await locationInput.fill("");
       await locationInput.fill(location);
 
       await this.page.keyboard.press("Enter");
-      await this.page.waitForTimeout(2000);
-      console.log(this.page.url())
+
+      // esperamos a que carguen los resultados
+      await this.page.waitForLoadState("networkidle");
+      console.info("✅ Busqueda completada.");
     } catch (err) {
+      if (err instanceof Error) {
+        if (err.name === "TimeoutError") {
+          throw new AppError(
+            "⏰ Timeout esperando elementos de búsqueda",
+            408,
+            true
+          );
+        }
+      }
       const error =
         err instanceof Error
-          ? new AppError(
-              `Fallo en la búsqueda: ${(err as Error).message}`,
-              400,
-              true
-            )
-          : new Error("Unknown error");
+          ? new AppError(`❌ Fallo en la búsqueda: ${err.message}`, 400, true)
+          : new Error("❌ Error desconocido en búsqueda");
       throw error;
     }
   }
 
   public async scrape(): Promise<Job[]> {
     try {
-      const data = await this.extractJobs();
-      console.log(data);
-      return data;
+      await this.extractJobs();
+      // console.log(data);
+      return [];
     } catch (err) {
       const error =
         err instanceof Error
@@ -88,7 +116,43 @@ class GlassdoorScraper extends BaseScraper {
     }
   }
 
-  protected async extractJobs(): Promise<Job[]> {}
+  protected async extractJobs(): Promise<Job[]> {
+    console.log("📦 Extrayendo los datos de cada vacante");
+    try {
+      await this.page.waitForLoadState("networkidle");
+      const container = this.page.locator("#left-column");
+      await container.waitFor({ state: "visible", timeout: 500 });
+
+      const jobCards = this.page.locator("#job-card-wrapper");
+      console.log(await jobCards.evaluate((node) => node.outerHTML));
+
+      // return jobCards.evaluateAll((cards) => {
+      //   return cards.map((card) => {
+      //     const $title = card.querySelector("[job-title]");
+      //     const title =
+      //       $title?.textContent?.trim() ??
+      //       "⚠️ No se encontro el titulo de la vacante";
+      //     return { id: crypto.randomUUID(), title };
+      //   });
+      // });
+      return [];
+    } catch (err) {
+      console.error("📍 URL actual:", this.page.url());
+      await this.page.screenshot({
+        path: "./src/screenshots/debug-glassdoor.png.png",
+        fullPage: true,
+      });
+      const error =
+        err instanceof Error
+          ? new AppError(
+              `❌ Error extrayendo vacantes: ${(err as Error).message}`,
+              400,
+              true
+            )
+          : new Error("❌ Error desconocido extrayendo vacantes");
+      throw error;
+    }
+  }
 
   async close(): Promise<void> {
     try {

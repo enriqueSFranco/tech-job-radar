@@ -1,2 +1,2 @@
-GET http://localhost:3000/api/jobs HTTP/1.
-###
+### Obtener vacantes por defecto de los sitios web scrapeados
+GET http://localhost:3000/api/jobs?page=1&perPage=20 HTTP/1.1
