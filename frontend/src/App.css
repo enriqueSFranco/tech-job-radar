@@ -8,11 +8,15 @@ body {
 }
 
 .content {
-  max-width: 1200px;
+  max-width: 1920px;
   width: 100%;
   line-height: 1.1;
   text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 20;
+  align-items: center;
+  justify-content: center;
+  gap: 32;
+  padding: 16px;
 }
+

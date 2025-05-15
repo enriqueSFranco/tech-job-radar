@@ -1,30 +1,31 @@
+import { Link } from "react-router";
 import type { Job } from "@/types";
 import { IcBookMark, IcOffice } from "../../../shared/icons";
-import { Link } from "react-router";
-import { IcGlassdoor } from "../../../shared/icons/business/IcGlassdoor";
-import { IcOcc } from "../../../shared/icons/business/IcOcc";
+// import { IcGlassdoor } from "../../../shared/icons/business/IcGlassdoor";
+// import { IcOcc } from "../../../shared/icons/business/IcOcc";
 import { Badge } from "@/ui/atoms/Badge";
 
 interface Props {
   item: Job;
   recommendedVacancy?: boolean;
-  onSaveJob(): void;
   isSave: boolean;
+  path?: string
+  onSaveJob(): void;
 }
 
-export function Card({ item, recommendedVacancy, onSaveJob, isSave }: Props) {
+export function Card({ item, recommendedVacancy, isSave, path, onSaveJob }: Props) {
   const cardClassName = recommendedVacancy
     ? ""
-    : "p-2 flex flex-col justify-bwetween gap-2 h-[200px] bg-white/5";
+    : "p-2 flex flex-col justify-bwetween gap-2 bg-white/5 xl:outline xl:outline-neutral-900";
 
   // const iconModalityWork = item.isRemote ? <IcHomeWork /> : <IcOffice />;
-  const applicationUrlHost = new URL(item.applicationUrl).host;
-  const siteName = applicationUrlHost.split(".")[1];
-  const buttonBackgroundColor = siteName.includes("occ") ? "#0A3CAD59" : "#00A26340";
-  const siteIcon = siteName.includes("occ") ? <IcOcc /> : <IcGlassdoor />;
-
+  // const applicationUrlHost = new URL(item.applicationUrl).host;
+  // const siteName = applicationUrlHost.split(".")[1];
+  // const buttonBackgroundColor = siteName.includes("occ") ? "#0A3CAD59" : "#00A26340";
+  // const siteIcon = siteName.includes("occ") ? <IcOcc /> : <IcGlassdoor />;
+  console.log(`/${path}/${item.id}`)
   return (
-    <article className={`${cardClassName}`} aria-labelledby={`job-title-${item.id}`} role="region" data-testid={`job-card-${item.id}`}>
+    <Link to={`/${path}/${item.id}`} className={`${cardClassName} overflow-hidden w-full h-full`} aria-labelledby={`job-title-${item.id}`} role="region" data-testid={`job-card-${item.id}`}>
       <header className="flex items-start justify-between text-sm">
         <div className="flex flex-col items-start justify-start gap-2">
           <h2 id={`job-title-${item.id}`} data-testid={`job-title-${item.id}`} className="font-bold text-lg tracking-wide">{item.jobTitle}</h2>
@@ -64,7 +65,7 @@ export function Card({ item, recommendedVacancy, onSaveJob, isSave }: Props) {
         <label className="text-gray-400 text-sm font-light">
           {item.datePosted}
         </label>
-        <Link
+        {/* <Link
           to={item.applicationUrl}
           target="_blank"
           rel="noopener noreferrer"
@@ -75,8 +76,8 @@ export function Card({ item, recommendedVacancy, onSaveJob, isSave }: Props) {
         >
           Ir a
           {siteIcon}
-        </Link>
+        </Link> */}
       </footer>
-    </article>
+    </Link>
   );
 }

@@ -5,7 +5,7 @@ type TabOptions = {
   id: string,
     label: string,
     icon: React.ReactNode,
-    href: string,
+    path: string,
 }
 
 type TabSwitcherProps = {
@@ -27,15 +27,22 @@ export function VacancySwitcher({tabs, defaultActiveTabId, onTabChange}: TabSwit
     }
   }, [activeTab]);
 
+  useEffect(() => {
+    if (defaultActiveTabId) {
+      setActiveTab(defaultActiveTabId);
+    }
+  }, [defaultActiveTabId]);
+
+
   const handleTabClick = (id: string) => {
     onTabChange?.(id);
   };
 
   return (
-    <div className="grid place-content-center w-full mt-3">
+    <div className="grid place-content-center w-full mt-12">
       <nav className="w-full m-auto">
         <ul className="flex items-center justify-between gap-4">
-          {tabs.map(({ id, label, icon, href }) => {
+          {tabs.map(({ id, label, icon, path }) => {
             const isActive = activeTab === id;
             const colorClass = isActive ? "text-white" : "text-gray-400";
             return (
@@ -44,11 +51,11 @@ export function VacancySwitcher({tabs, defaultActiveTabId, onTabChange}: TabSwit
                 ref={(el) => (tabRefs.current[id] = el)}
                 className="inline-block relative px-4 py-2"
               >
-                {href ? (
+                {path ? (
                   <Link
-                    to={href}
+                    to={path}
                     className={`text-base flex items-center justify-between gap-1 ${colorClass}`}
-                    onClick={() => setActiveTab(id)}
+                    onClick={() => {setActiveTab(id); handleTabClick(id)}}
                   >
                     {icon && icon}
                     {label}
