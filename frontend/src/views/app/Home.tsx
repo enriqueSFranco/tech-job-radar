@@ -1,4 +1,4 @@
-import { JobList } from "@/features/jobs/components/JobList";
+import { JobList } from "@/features/jobs/components/JobList/JobList";
 import { SearchForm } from "@/features/search/components/SearchForm";
 import { Debugger } from "@/shared/components/Debugger";
 import { Job } from "@/types";
@@ -9,8 +9,18 @@ import { VacancySwitcher } from "@/ui/VacancySwitcher";
 import { Suspense, useEffect, useState } from "react";
 import "../../App.css";
 import { useScrollTrigger } from "@/hooks/useScrollTrigger";
+import { IcSparkles } from "@/shared/icons";
 
 const jobs: Job[] = data;
+const tabOptions = [
+  {
+    id: crypto.randomUUID(),
+    label: "Para ti",
+    icon: <IcSparkles />,
+    href: "/",
+  },
+  { id: crypto.randomUUID(), label: "Buscar", icon: null, href: "/" },
+];
 
 const MOBILE_BREAKPOINT = 768;
 
@@ -52,7 +62,7 @@ export function Home() {
   };
 
   function handleToggleMenu() {
-    setIsPanelOpen((prevState) => !prevState);
+    // setIsPanelOpen((prevState) => !prevState);
     console.log("open menu ", isPanelOpen);
   }
 
@@ -69,17 +79,16 @@ export function Home() {
               <PanelMenu isOpen={isPanelOpen} isScrolled={isScrolled} onToggle={handleToggleMenu} />
             </Suspense>
           )}
-        <div className="w-full fex flex-col gap-4 pt-16">
+        <div className="w-full fex flex-col gap-4 pt-16 relative">
           <SearchForm />
-          {/* TODO: Implementar los filtros */}
-          <VacancySwitcher />
+          <VacancySwitcher tabs={tabOptions} defaultActiveTabId="1" />
+          <div className="w-full h-[0.5px] bg-neutral-800"></div>
         </div>
-        <JobList
-          items={jobs}
-          toggleSaveJob={toggleSaveJob}
-          isJobSaved={isJobSaved}
-        />
-        {/* TODO: implementar el footer */}
+          <JobList
+            items={jobs}
+            toggleSaveJob={toggleSaveJob}
+            isJobSaved={isJobSaved}
+          />
         <Debugger data={myJobs} />
       </div>
     </>
