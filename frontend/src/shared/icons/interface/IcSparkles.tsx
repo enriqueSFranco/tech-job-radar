@@ -6,16 +6,9 @@ export function IcSparkles() {
       width={24}
       height={24}
     >
-      <defs>
-        <linearGradient id="strokeGradient" x1="0%" y1="100%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#86efac" />      {/* green-300 */}
-          <stop offset="50%" stopColor="#3b82f6" />     {/* blue-500 */}
-          <stop offset="100%" stopColor="#9333ea" />    {/* purple-600 */}
-        </linearGradient>
-      </defs>
 
       <path
-        stroke="url(#strokeGradient)"
+        stroke="#fff"
         strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
