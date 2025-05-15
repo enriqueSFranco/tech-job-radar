@@ -10,7 +10,7 @@ interface Props {
 export function Header({ showButtonMenu, isScrolled, onToggleMenu }: Props) {
   return (
     <header
-      className={`px-4 flex items-center justify-between gap-2 w-full h-16 transition-colors duration-300 fixed top-0 ${
+      className={`px-4 flex items-center justify-between gap-2 w-full h-16 transition-colors duration-300 fixed top-0 z-50 ${
         isScrolled ? "bg-white" : "bg-black/90 backdrop-blur-2xl"
       }`}
     >
