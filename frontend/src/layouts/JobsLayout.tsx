@@ -1,6 +1,6 @@
 import { JobList } from '@/features/jobs/components/JobList/JobList';
 import { Outlet, useLocation } from 'react-router';
-import data from "@/resources/json/jobs.json";
+import data from "@/resources/json/mockApiData.json";
 import { Job } from "@/types";
 
 const jobs: Job[] = data;
@@ -9,7 +9,7 @@ const myJobs: Job[] = [];
 export function JobsLayout() {
   const location = useLocation()
   const basePath = location.pathname.includes("vacantes") ? "vacantes" : "recomendaciones"
-  console.log(basePath)
+
   const toggleSaveJob = (id: string) => () => {};
 
   const isJobSaved = (id: string) => myJobs.some((job) => job.id === id);
