@@ -3,12 +3,13 @@ import { JobService } from "../services/job.service";
 import { JobController } from "../controllers/job.controller";
 import glassdoorScraper from "../infrastructure/scrapers/GlassdoorScraper";
 import occScraper from "../infrastructure/scrapers/OccScraper";
+import { validateJobQuery } from "../middlewares/job.middleware";
 
 const router = Router();
 
 const service = new JobService([occScraper]);
 const controller = new JobController(service)
 
-router.get("/jobs", controller.getJobs);
+router.get("/jobs", validateJobQuery, controller.getJobs);
 
 export default router
