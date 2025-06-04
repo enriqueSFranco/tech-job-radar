@@ -56,7 +56,7 @@
     "techStack": ["Python", "Pandas", "TensorFlow", "SQL"],
     "experienceLevel": "Senior",
     "educationRequirements": "Master’s in Data Science",
-    "applicationUrl": "https://insightai.com/careers/data-scientist",
+    "applicationUrl": "https://www.glassdoor.com.mx/careers/data-scientist",
     "salaryRange": "€50,000 - €70,000"
   },
   {
@@ -71,7 +71,7 @@
     "techStack": ["AWS", "Terraform", "Kubernetes", "CI/CD"],
     "experienceLevel": "Mid",
     "educationRequirements": "Bachelor's degree preferred",
-    "applicationUrl": "https://cloudnest.io/jobs/devops",
+    "applicationUrl": "https://www.glassdoor.com.mx/jobs/devops",
     "salaryRange": "€45,000 - €60,000"
   },
   {
@@ -86,7 +86,7 @@
     "techStack": ["Flutter", "Dart", "Firebase"],
     "experienceLevel": "Junior",
     "educationRequirements": "Not required",
-    "applicationUrl": "https://appify.com/careers/mobile-dev",
+    "applicationUrl": "https://www.glassdoor.com.mx/careers/mobile-dev",
     "salaryRange": "$30,000 - $40,000"
   },
   {
@@ -101,7 +101,7 @@
     "techStack": ["Python", "Scikit-learn", "PyTorch"],
     "experienceLevel": "Senior",
     "educationRequirements": "PhD or Master's in relevant field",
-    "applicationUrl": "https://neuralcore.ai/jobs/ml-engineer",
+    "applicationUrl": "https://www.glassdoor.com.mx/jobs/ml-engineer",
     "salaryRange": "€70,000 - €90,000"
   },
   {
