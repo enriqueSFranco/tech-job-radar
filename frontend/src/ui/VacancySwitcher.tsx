@@ -33,15 +33,14 @@ export function VacancySwitcher({tabs, defaultActiveTabId, onTabChange}: TabSwit
     }
   }, [defaultActiveTabId]);
 
-
   const handleTabClick = (id: string) => {
     onTabChange?.(id);
   };
 
   return (
-    <div className="grid place-content-center w-full mt-12">
+    <div className="grid place-content-center w-full mt-10">
       <nav className="w-full m-auto">
-        <ul className="flex items-center justify-between gap-4">
+        <ul className="flex items-center justify-between gap-4 relative">
           {tabs.map(({ id, label, icon, path }) => {
             const isActive = activeTab === id;
             const colorClass = isActive ? "text-white" : "text-gray-400";
@@ -73,7 +72,7 @@ export function VacancySwitcher({tabs, defaultActiveTabId, onTabChange}: TabSwit
             );
           })}
           <span
-            className="absolute bottom-0 h-[2px] bg-white transition-all duration-300"
+            className="absolute bottom-0 h-[2px] bg-blue-400 transition-all duration-300"
             style={{ left: indicatorStyles.left, width: indicatorStyles.width }}
           ></span>
         </ul>
