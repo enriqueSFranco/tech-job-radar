@@ -1,8 +1,8 @@
 import axios from "axios"
-
-const API_URL = new URL(`${process.env.API_URL}`)
+import {BASE_API_URL} from "@/config/environments"
 
 export const axiosClient = axios.create({
-  baseURL: API_URL.toString(),
+  baseURL: BASE_API_URL.toString(),
+  timeout: 3000,
   headers: {"Content-Type": "application/json"}
 })
