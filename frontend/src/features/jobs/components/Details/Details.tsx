@@ -1,11 +1,19 @@
 import { Job } from "@/types"
+// import { IcGlassdoor } from "../../../../shared/icons/business/IcGlassdoor";
+// import { IcOcc } from "../../../../shared/icons/business/IcOcc";
+import { useLocation } from "react-router";
 
 type Props = {
   job: Job
 }
 export function Details({job}: Props) {
+  const location = useLocation()
+  // const applicationUrlHost = new URL(location.pathname).host;
+  // const siteName = applicationUrlHost.split(".")[1];
+  // const buttonBackgroundColor = siteName.includes("occ") ? "#0A3CAD59" : "#00A26340";
+  // const siteIcon = siteName.includes("occ") ? <IcOcc /> : <IcGlassdoor />;
   return (
-    <article>
+    <article className="">
       <header className="">
         <div className="flex flex-col items-start justify-center">
 
