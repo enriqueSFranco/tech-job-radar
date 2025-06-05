@@ -16,7 +16,9 @@ export function Card({ item, isSelected }: Props) {
 
   const isSaved = savedJobs.some((j) => j.id === item.id);
 
-  function handleSaveToggle() {
+  function handleSaveToggle(e: React.MouseEvent) {
+    e.stopPropagation();
+    e.preventDefault();
     if (isSaved) {
       dispatch(removeSavedJob({ id: item.id }));
     } else {
