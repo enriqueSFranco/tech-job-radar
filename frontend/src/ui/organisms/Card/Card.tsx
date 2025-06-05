@@ -1,9 +1,9 @@
-import { Link, useLocation } from "react-router";
+import { Link } from "react-router";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import type { Job } from "@/types";
-import { IcBookMark, IcOffice } from "../../../shared/icons";
 import { Chip } from "@/ui/atoms/Chip";
 import { addSavedJob, removeSavedJob } from "@/features/jobs/savedJobs.slice";
+import { IcBookMark } from "@/shared/icons/IcBookMark";
 
 interface Props {
   item: Job;
@@ -13,9 +13,7 @@ interface Props {
 export function Card({ item, isSelected }: Props) {
   const dispatch = useAppDispatch();
   const savedJobs = useAppSelector((state) => state.savedJobs.savedJobs);
-  const location = useLocation()
 
-  const currentPath = location.pathname.replace(/\/$/, '')
   const isSaved = savedJobs.some((j) => j.id === item.id);
 
   function handleSaveToggle() {
@@ -45,7 +43,7 @@ export function Card({ item, isSelected }: Props) {
         />
       </button>
       <Link
-        to={`${currentPath}/${item.id}`}
+        to={`/vacantes/${item.id}`}
         className={`${
           isSelected ? "border-blue-600" : "border-neutral-800"
         } p-2 flex flex-col justify-bwetween gap-2 bg-white/5 xl:outline xl:outline-neutral-900 overflow-hidden w-full h-full rounded-xl border-[1px]`}
@@ -64,7 +62,6 @@ export function Card({ item, isSelected }: Props) {
             </h2>
             <div className="flex items-center justify-start gap-1">
               <div className="flex items-center gap-1.5">
-                <IcOffice />
                 <h3 className="text-sm text-gray-400 self-end">
                   {item.companyName}
                 </h3>
