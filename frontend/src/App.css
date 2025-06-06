@@ -1,22 +1,66 @@
 @import 'tailwindcss';
 
-body {
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
   margin: 0;
-  color: #fff;
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+}
+
+body {
+  color: #fff;
   background: #000;
 }
 
-.content {
-  max-width: 1920px;
-  width: 100%;
-  line-height: 1.1;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 32;
-  padding: 16px;
+/* styles/tags.css */
+[data-category="comercial"] .tag {
+  background-color: #db562532;
+  color: #ff9d00;
 }
 
+[data-category="tecnologia"] .tag {
+  background-color: #2571db32;
+  color: #6ab2f6;
+}
+
+[data-category="finanzas"] .tag {
+  background-color: #73d4a532;
+  color: #17dfa3;
+}
+
+[data-category="administracion"] .tag {
+  background-color: #a95edf32;
+  color: #af60fd;
+}
+
+[data-category="ingenieria"] .tag {
+  background-color: #5a8b9332;
+  color: #00d0ff;
+}
+
+[data-category="rrhh"] .tag {
+  background-color: #df39c032;
+  color: #ee60fb;
+}
+
+[data-category="logistica"] .tag {
+  background-color: #dba72532;
+  color: #ffcc00;
+}
+
+[data-category="operaciones"] .tag {
+  background-color: #7d7d7d32;
+  color: #afafad;
+}
+
+
+.fade-mask {
+  mask-image:
+    linear-gradient(to top, transparent, black 20%),
+    linear-gradient(to bottom, transparent, black 20%),
+    linear-gradient(to left, transparent, black 20%),
+    linear-gradient(to right, transparent, black 20%);
+  mask-composite: intersect;
+  -webkit-mask-composite: destination-in;
+}
