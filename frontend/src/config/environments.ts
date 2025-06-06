@@ -2,10 +2,10 @@
 import { string, number, object, InferType } from "yup";
 
 const envSchema = object({
-  API_ENDPOINT: string()
-    .url()
+  BASE_API_URL: string()
+    // .url()
     .required("API_ENDPOINT es requerida")
-    .default("https://jobradar.api.com/"),
+    .default("http://localhost:3000/"),
   API_JOBS: string()
     .required("API_JOBS es requerida")
     .default("api/v1/jobs"),
@@ -18,13 +18,13 @@ const envSchema = object({
 type Env = InferType<typeof envSchema>;
 
 // Cambiamos nombre para no redeclarar
-const rawApiEndpoint = import.meta.env.API_URL;
+const rawApiEndpoint = import.meta.env.BASE_API_URL;
 const rawApiJobs = import.meta.env.API_JOBS;
 const rawApiRecommendations = import.meta.env.API_RECOMMENDATIONS;
 const rawPort = import.meta.env.PORT;
 
 const env: Env = {
-  API_ENDPOINT: rawApiEndpoint || "https://jobradar.api.com/",
+  BASE_API_URL: rawApiEndpoint || "https://jobradar.api.com/",
   API_JOBS: rawApiJobs || "api/v1/jobs",
   API_RECOMMENDATIONS: rawApiRecommendations || "api/v1/recommendations",
   PORT: rawPort ? Number(rawPort) : 4000,
@@ -35,4 +35,4 @@ const validatedEnv = envSchema.validateSync(env, {
   abortEarly: false,
 });
 
-export const { API_ENDPOINT, API_JOBS, API_RECOMMENDATIONS, PORT } = validatedEnv;
+export const { BASE_API_URL, API_JOBS, API_RECOMMENDATIONS, PORT } = validatedEnv;
