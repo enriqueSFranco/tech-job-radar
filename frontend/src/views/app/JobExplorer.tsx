@@ -43,7 +43,7 @@ export function JobExplorer() {
   });
 
   return (
-    <main className="sm:container sm:mx-auto">
+    <>
       <div className="flex flex-col justify-center h-28 w-full">
         <TabSwitcher
           tabs={tabOptions}
@@ -77,6 +77,6 @@ export function JobExplorer() {
           </div>
         )}
       </div>
-    </main>
+    </>
   );
 }
