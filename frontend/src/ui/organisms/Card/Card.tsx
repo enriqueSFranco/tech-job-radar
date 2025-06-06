@@ -37,7 +37,7 @@ export function Card({ item, isSelected }: Props) {
   return (
     <article
       onClick={handleClick}
-      className={`relative cursor-pointer transform transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-2 flex flex-col gap-2 rounded-xl w-full ${isSelected ? "bg-blue-700/15 border-[1px]" : "border-neutral-800"} xl:outline xl:outline-neutral-900 p-4`}
+      className={`relative cursor-pointer transform transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-2 flex flex-col gap-2 rounded-xl w-full ${isSelected ? "bg-neutral-900 border-neutral-700 border-[1px]" : "border-neutral-800"} xl:outline xl:outline-neutral-900 p-4`}
       aria-labelledby={`job-title-${item.id}`}
       role="region"
       data-testid={`job-card-${item.id}`}
