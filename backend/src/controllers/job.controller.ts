@@ -1,32 +1,51 @@
-import {Response, Request} from "express"
-import { Job } from "../models/job.model";
-import { JobService } from "../services/job.service";
+import { Response, Request } from "express";
+import { JobServiceFactory } from "../services/job-service.factory";
+import { WinstonLoggerAdapter } from "../adapters/logger.adapter";
+
+const scraperService = JobServiceFactory.create("scraper");
+const databaseService = JobServiceFactory.create("database");
 
 export class JobController {
-  constructor(private readonly service: JobService) {}
+  private logger = new WinstonLoggerAdapter("job.controller.ts");
 
-  getJobs = async (req: Request, res: Response) => {
+  constructor(private readonly service) {}
+
+  searchJobs = async (req: Request, res: Response) => {
     try {
-      const {page = 1, perPage = 20} = req.query
-      const pageNumber = parseInt(page)
-      const pageSize = parseInt(perPage)
+      const { page, resultPerPage, keyword, location } = req.query;
+      console.log(req.params);
+      const pageNumber = parseInt(page as string, 10);
+      const perPage = parseInt(resultPerPage as string, 10);
+      const results = await this.service.searchJobsLive({
+        keyword: keyword as string,
+        location: location as string,
+      });
+      const totalJobs = results.length;
+      const totalPages = Math.ceil(totalJobs / perPage);
+      const startIndex = (pageNumber - 1) * perPage;
+      const endIndex = startIndex + perPage;
+      const paginatedJobs = results.slice(startIndex, endIndex);
 
-      if (isNaN(pageNumber) || pageNumber < 1) {
-        res.status(400).json({message: "Numero de pagina invalido"})
-      }
-      if (isNaN(pageSize) || pageSize  < 1) {
-        res.status(400).json({message: "Cantidad de vacantes por pagina invalida"})
-      }
-      const allJobs: Job[] = await this.service.getJobs();
-      const totalJobs = allJobs.length
-      const totalPages = Math.ceil(totalJobs / pageSize)
-
-      const startIndex = (pageNumber - 1) * pageSize
-      const endIndex = pageNumber * pageSize
-      const paginatedJobs = allJobs.slice(startIndex, endIndex)
-      res.json({ results: paginatedJobs, totalJobs, totalPages, currentPage: pageNumber, perPage: pageSize });
+      res.json({
+        data: paginatedJobs,
+        pagination: {
+          total_jobs: totalJobs,
+          total_pages: totalPages,
+          current_page: pageNumber,
+          result_per_page: perPage,
+        },
+        links: {
+          self: `/search?keyword=${keyword}&location=${location}&page=${pageNumber}&resultPerPage=${perPage}`,
+          next:
+            pageNumber < totalPages
+              ? `/search?keyword=${keyword}&location=${location}&page=${
+                  pageNumber + 1
+                }&resultPerPage=${perPage}`
+              : null,
+        },
+      });
     } catch (e) {
-      console.error("Error en getJobs:", e);
+      this.logger.writeError(`Error en getJobs: ${e}`);
       res.status(500).json({ message: "Error interno del servidor" });
     }
   };

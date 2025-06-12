@@ -1,2 +1,18 @@
-### Obtener vacantes por defecto de los sitios web scrapeados
-GET http://localhost:3000/api/jobs?page=1&perPage=20 HTTP/1.1
+# Recupera todas las vacantes almacenadas en la base de datos,independientemente de su origen.
+GET http://localhost:3000/api/v1/jobs HTTP/1.1
+
+# Busca vacantes por una etiqueta específica (como "ventas", "marketing"). Este endpoint aplica solamente al scraper de OCC
+GET http://localhost:3000/api/v1/scraper/occ/jobs?tag=ventas HTTP/1.1
+
+# Ejecuta un scraping en los sitios disponibles con los parámetros dados.
+GET http://localhost:3000/api/v1/search?keyword=java-developer&location=ciudad-de-mexico&page=1&resultPerPage=10 HTTP/1.1
+
+GET http://localhost:3000/api/v1/search?keyword=java-developer&location=ciudad-de-mexico&page=2&resultPerPage=10 HTTP/1.1
+
+GET http://localhost:3000/api/v1/search?keyword=java-developer&location=ciudad-de-mexico&page=100&resultPerPage=10 HTTP/1.1
+
+
+
+# Devuelve una vacante específica por su ID único. Puede provenir de cualquier sitio scrapeado.
+GET http://localhost:3000/api/v1/jobs/d1c43dfe-608d-43aa-8bc8-5c2e9e8c6ea6 HTTP/1.1
+

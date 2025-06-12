@@ -1,0 +1,11 @@
+.card {}
+
+div[data-description].truncate_description {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: calc(1.5em * 3);
+  display: -webkit-box;
+  --webkit-box-orient: vertical;
+  --webkit-line-clamp: 3;
+}

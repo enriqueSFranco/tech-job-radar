@@ -11,14 +11,13 @@ function isSerializable(value: any): boolean {
   }
 }
 
-export const Debugger: React.FC<DebuggerProps> = ({ data }) => {
+export const Debugger = ({ data}: DebuggerProps) => {
   const renderData = (data: any): string => {
     if (data === null || typeof data === 'undefined') {
       return String(data);
     }
 
     if (typeof data === 'object') {
-      // Solo intenta serializar si es posible
       if (isSerializable(data)) {
         return JSON.stringify(data, null, 2);
       } else {
@@ -30,7 +29,7 @@ export const Debugger: React.FC<DebuggerProps> = ({ data }) => {
   };
 
   return (
-    <div className="fixed max-h-full top-4 left-4 overflow-y-auto rounded-lg bg-black/20 outline-[1px] whitespace-pre-wrap outline-white/20 p-3 text-left opacity-95 backdrop-blur-sm">
+    <div className="fixed max-h-full top-0 left-0 overflow-y-auto rounded-lg bg-black/20 outline-[1px] whitespace-pre-wrap outline-white/20 p-3 text-left opacity-95 backdrop-blur-sm z-50">
       <pre className="text-sm opacity-80">{renderData(data)}</pre>
     </div>
   );

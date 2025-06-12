@@ -1,0 +1,25 @@
+.job_list > li {
+  border-bottom: 1px solid #3f3f46;
+}
+
+.job_list > li:last-child {
+  border-bottom: none;
+}
+
+.job_list > li:has(+ li.selected) {
+  border-bottom: none;
+}
+
+.job_list > li.selected {
+  border-radius: 0.75rem;
+  border: 1px solid #4b5563;
+  background-color: #27272a;
+  transition: all;
+  transition-duration: 300ms;
+  transition-timing-function: ease-in-out;
+}
+
+.selected {
+  border-top: 2px solid #2563eb; /* azul tailwind-600 */
+  background-color: #1f2937; /* bg-gray-800 */
+}

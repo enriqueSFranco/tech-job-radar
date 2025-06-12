@@ -4,8 +4,39 @@ import { AppError } from "../../shared/AppError";
 import { slugify } from "../../shared/slugify";
 import { SearchParams } from "./types";
 import { OCC_BASE_URL } from "../../config/environment";
+import { WinstonLoggerAdapter, type ILoggerAdapter } from "../../adapters/logger.adapter";
 
+// 👁️ Evita hacer scraping cada vez que se consulta el frontend. Mejor guardar en base de datos y actualiza cada cierto tiempo.
+/* TODOS
+ 1. Agendar el scraping como una tarea periódica
+ Usa un cron job (con node-cron, cron forn node.js) para ejecutar el scraping cada X horas. Así la API siempre responde rápido sin hacer scraping en vivo.
+```
+  import cron from "node-cron";
+  cron.schedule("0 * * * *", () => {
+    console.log("Ejecutando scraper cada hora...");
+    scrapeAndSave();
+  });
+```
+
+2. Añadir logs y manejo de errores
+
+3. Respetar términos y condiciones (legal y técnico)
+Añade un User-Agent válido.
+No ataques con muchas peticiones simultáneas.
+Usa robots.txt como guía, aunque no siempre es obligatorio.
+
+### 🚀 Extras si quieres llevarlo al siguiente nivel
+
+- **Agragar filtros avanzados en la API**: por stack, ubicación, tipo (remoto/presencial).
+- **Exportación de resultados**: a Excel, PDF, CSV.
+- **Alertas por correo**: con nodemailer si hay nuevas vacantes.
+
+🚀 ¿Qué aportaría usar transformers para recomendaciones?
+1.Entender semánticamente las vacantes y los perfiles.
+2.Recomendar empleos similares a los intereses o historial del usuario (más allá de solo "palabras clave").
+ */
 export class OccScraper {
+  private logger: ILoggerAdapter = new WinstonLoggerAdapter("OccScraper.ts");
   private browser!: Browser;
   private context!: BrowserContext;
   private page!: Page;
@@ -19,7 +50,7 @@ export class OccScraper {
    */
   public async init(): Promise<void> {
     try {
-      console.log("🚀 Iniciando navegador...");
+      this.logger.writeInfo("🚀 Iniciando navegador...");
       this.browser = await chromium.launch({ headless: false });
       this.context = await this.browser.newContext({
         userAgent:
@@ -29,8 +60,8 @@ export class OccScraper {
       });
       this.page = await this.context.newPage();
       this.page.addInitScript(() => {
-        Object.defineProperty(navigator, "webdriver", {get: () => false})
-      })
+        Object.defineProperty(navigator, "webdriver", { get: () => false });
+      });
     } catch (err) {
       throw new AppError("Fallo al inicializar Playwright", 500, true);
     }
@@ -47,7 +78,7 @@ export class OccScraper {
       const normalizedKeyword = keyword.toLowerCase();
       const normalizedLocation = location.toLowerCase();
 
-      console.log(
+      this.logger.writeInfo(
         `🔍 Buscando trabajos para: "${normalizedKeyword}" en "${normalizedLocation}"`
       );
       await this.page.goto(this.url.toString(), {
@@ -75,7 +106,9 @@ export class OccScraper {
         .first();
 
       const optionText = await firstLocationOption.textContent();
-      console.log("🧭 Opción de ubicación seleccionada:", optionText?.trim());
+      this.logger.writeInfo(
+        `🧭 Opción de ubicación seleccionada: ${optionText?.trim()}`
+      );
 
       await firstLocationOption.click();
 
@@ -88,10 +121,10 @@ export class OccScraper {
       )}/en-${slugify(normalizedLocation)}/`;
       const expectedUrl = new URL(expectedPath, this.url).toString();
 
-      console.log(`📡 Esperando redirección a resultados: ${expectedUrl}`);
+      this.logger.writeInfo(`📡 Esperando redirección a resultados: ${expectedUrl}`);
       await this.page.waitForURL(expectedUrl, { waitUntil: "networkidle" });
 
-      console.log(`🔗 current url: ${this.page.url()}`);
+      this.logger.writeInfo(`🔗 current url: ${this.page.url()}`);
     } catch (err) {
       const error =
         err instanceof Error
@@ -111,7 +144,7 @@ export class OccScraper {
         await this.page.waitForTimeout(3000);
       }
 
-      console.log(`📦 Extrayendo datos de página ${page}...`);
+      this.logger.writeInfo(`📦 Extrayendo datos de página ${page}...`);
       const newJobs = await this.extractJobs();
       this.jobs.push(...newJobs);
     }
@@ -133,7 +166,7 @@ export class OccScraper {
         await this.scrapePaginatedResults(maxPage);
       }
 
-      console.log(
+      this.logger.writeInfo(
         `✅ Scraping finalizado. Total de trabajos: ${this.jobs.length}`
       );
       return this.jobs;
@@ -176,7 +209,7 @@ export class OccScraper {
     const minPage = Math.min(...pageNumbers);
     const maxPage = Math.max(...pageNumbers);
 
-    console.log(`📚 Paginación detectada: ${minPage} -> ${maxPage}`);
+    this.logger.writeInfo(`📚 Paginación detectada: ${minPage} -> ${maxPage}`);
     return { minPage, maxPage };
   }
 
@@ -223,11 +256,11 @@ export class OccScraper {
    */
   public async close(): Promise<void> {
     try {
-      console.log("🛑 Cerrando navegador...");
+      this.logger.writeInfo("🛑 Cerrando navegador...");
       await this.context.close();
       await this.browser.close();
     } catch (err) {
-      console.warn("⚠️ Error al cerrar navegador:", err);
+      this.logger.writeWarn(`⚠️ Error al cerrar navegador: ${err}`);
     }
   }
 }
