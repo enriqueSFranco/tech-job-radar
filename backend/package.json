@@ -23,11 +23,14 @@
   "license": "ISC",
   "dependencies": {
     "@types/express": "^5.0.1",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "winston": "^3.17.0",
+    "yup": "^1.6.1"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
     "@types/node": "^22.14.1",
+    "@types/winston": "^2.4.4",
     "playwright": "^1.51.1",
     "tsx": "^4.19.3",
     "typescript": "^5.8.3"

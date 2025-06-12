@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { jobSearchQuerySchema } from "../models/job.model";
+import { jobSearchQuerySchema,  } from "../models/job.model";
 
 export async function validateJobQuery(
   req: Request,
@@ -7,9 +7,9 @@ export async function validateJobQuery(
   next: NextFunction
 ) {
   try {
-    const { page, resultPerPage } = req.query;
+    const { page, resultsPerPage } = req.query;
     const pageNumber = Number(page) || 1;
-    const pageSize = Number(resultPerPage) || 20;
+    const pageSize = Number(resultsPerPage) || 20;
 
     if (isNaN(pageNumber) || pageNumber < 1) {
       res.status(400).json({ message: "Numero de pagina invalido" });
@@ -19,17 +19,16 @@ export async function validateJobQuery(
         .status(400)
         .json({ message: "Cantidad de vacantes por pagina invalida" });
     }
-    await jobSearchQuerySchema.validate(
-      req.query,
-      {
-        abortEarly: false,
-        stripUnknown: true,
-      }
-    );
+    const validatedQuery = await jobSearchQuerySchema.validate(req.query, {
+      abortEarly: false,
+      stripUnknown: true,
+    });
+    (req as any).validatedQuery = validatedQuery;
     next();
   } catch (e) {
-    const message = e.errors?.[0] || "Bad Request";
+    let message = ''
+    if (e instanceof Error)
+      message = e.message || "Bad Request";
     res.status(400).json({ message });
-    return;
   }
 }

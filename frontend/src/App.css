@@ -1,60 +1,135 @@
 @import 'tailwindcss';
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
+/* ===================================
+   Normalize & Global Reset
+=================================== */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
-  margin: 0;
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+}
+
+html {
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
 }
 
 body {
-  color: #fff;
-  background: #000;
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* styles/tags.css */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+  border: none;
+  outline: none;
+}
+
+/* ===================================
+   Theme Variables
+=================================== */
+:root {
+  /* Base Colors */
+  --background-color: #000;
+  --text-color: #ffff;
+
+  /* Tag Colors */
+  --tag-comercial-bg: #db562532;
+  --tag-comercial-text: #ff9d00;
+
+  --tag-tech-bg: #2571db32;
+  --tag-tech-text: #6ab2f6;
+
+  --tag-finance-bg: #73d4a532;
+  --tag-finance-text: #17dfa3;
+
+  --tag-admin-bg: #a95edf32;
+  --tag-admin-text: #af60fd;
+
+  --tag-engineering-bg: #5a8b9332;
+  --tag-engineering-text: #00d0ff;
+
+  --tag-hr-bg: #df39c032;
+  --tag-hr-text: #ee60fb;
+
+  --tag-logistics-bg: #dba72532;
+  --tag-logistics-text: #ffcc00;
+
+  --tag-ops-bg: #7d7d7d32;
+  --tag-ops-text: #afafad;
+}
+
+/* Dark Theme Override */
+/* body.dark {
+  --background-color: #000000;
+  --text-color: #ffffff;
+} */
+
+/* ===================================
+   Category Tag Styles
+=================================== */
 [data-category="comercial"] .tag {
-  background-color: #db562532;
-  color: #ff9d00;
+  background-color: var(--tag-comercial-bg);
+  color: var(--tag-comercial-text);
 }
 
 [data-category="tecnologia"] .tag {
-  background-color: #2571db32;
-  color: #6ab2f6;
+  background-color: var(--tag-tech-bg);
+  color: var(--tag-tech-text);
 }
 
 [data-category="finanzas"] .tag {
-  background-color: #73d4a532;
-  color: #17dfa3;
+  background-color: var(--tag-finance-bg);
+  color: var(--tag-finance-text);
 }
 
 [data-category="administracion"] .tag {
-  background-color: #a95edf32;
-  color: #af60fd;
+  background-color: var(--tag-admin-bg);
+  color: var(--tag-admin-text);
 }
 
 [data-category="ingenieria"] .tag {
-  background-color: #5a8b9332;
-  color: #00d0ff;
+  background-color: var(--tag-engineering-bg);
+  color: var(--tag-engineering-text);
 }
 
 [data-category="rrhh"] .tag {
-  background-color: #df39c032;
-  color: #ee60fb;
+  background-color: var(--tag-hr-bg);
+  color: var(--tag-hr-text);
 }
 
 [data-category="logistica"] .tag {
-  background-color: #dba72532;
-  color: #ffcc00;
+  background-color: var(--tag-logistics-bg);
+  color: var(--tag-logistics-text);
 }
 
 [data-category="operaciones"] .tag {
-  background-color: #7d7d7d32;
-  color: #afafad;
+  background-color: var(--tag-ops-bg);
+  color: var(--tag-ops-text);
 }
 
-
+/* ===================================
+   Fade Mask Utility
+=================================== */
 .fade-mask {
   mask-image:
     linear-gradient(to top, transparent, black 20%),

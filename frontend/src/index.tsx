@@ -11,13 +11,14 @@ async function prepareMocks() {
   }
   const {worker} = await import("@/mocks/browser")
   console.log('🧑🏻‍💻 this is development mode');
-  worker.start()
+  return worker.start()
 }
 
 const rootEl = document.getElementById("root");
 
 if (rootEl) {
   const root = ReactDOM.createRoot(rootEl);
+  document.documentElement.setAttribute("data-theme", "dark")
   prepareMocks().then(() => {
     root.render(
       <React.StrictMode>

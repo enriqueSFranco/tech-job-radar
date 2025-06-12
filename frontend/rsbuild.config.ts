@@ -12,6 +12,10 @@ export default defineConfig({
     },
   },
   html: {
+    meta: {
+      description: ""
+    },
+    favicon: "",
     tags: [
       {
         tag: "script",

@@ -1,0 +1,58 @@
+.job_description div, p {
+  margin-bottom: .5rem;
+}
+
+.job_description ul {
+  margin-left: 1.25rem;
+  margin-bottom: 1rem;
+  padding-left: 1.25rem;
+}
+
+.job_description li {
+  list-style-type: disc;
+}
+
+.job_description ol {
+  list-style-type: decimal;
+}
+
+.job-description a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.job-description strong {
+  font-weight: 600;
+}
+
+.job-description em {
+  font-style: italic;
+}
+
+.job-description h1,
+.job-description h2,
+.job-description h3,
+.job-description h4 {
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+
+article[data-website="occ"]::before {
+  background-color: #002D9C;
+}
+
+article[data-website="glassdoor"]::before {
+  background-color: #00A263;
+}
+
+article::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+}

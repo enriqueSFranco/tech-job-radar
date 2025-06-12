@@ -10,9 +10,4 @@ export interface IScraper {
   close(): Promise<void>;
   search({ keyword, location }: SearchParams): Promise<void>;
   scrape(): Promise<Job[]>;
-  // extractPaginationNumbers(): Promise<{
-  //   minPage: number;
-  //   maxPage: number;
-  // }>;
-  // extractJobs(): Promise<Job[]>;
 }

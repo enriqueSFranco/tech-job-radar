@@ -7,9 +7,7 @@ export function AuthRoutes() {
   return (
     <Routes>
       <Route path="/mi-perfil" element={<Favorites />} />
-      {/* <Route path="/vacantes" element={<Jobs />} /> */}
-      {/* <Route path="/recomendaciones" element={<JobsForYou />} /> */}
-      <Route path="/vacantes-favoritas" element={<Favorites />} />
+      <Route path="/empleos-favoritos" element={<Favorites />} />
     </Routes>
   );
 }

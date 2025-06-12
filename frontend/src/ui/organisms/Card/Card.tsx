@@ -1,17 +1,28 @@
-import { useLocation, useNavigate } from "react-router";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import type { Job } from "@/types";
-import { Chip } from "@/ui/atoms/Chip";
 import { addSavedJob, removeSavedJob } from "@/features/jobs/savedJobs.slice";
 import { IcBookMark } from "@/shared/icons/IcBookMark";
+import type { Job } from "@/types";
+import { Chip } from "@/ui/atoms/Chip";
+import { sanitizeHTML } from "@/utils/sanitize-html";
+import { timeAgo } from "@/utils/time-ago";
+import { useLocation, useNavigate } from "react-router";
+import styles from "./Card.module.css"
 
 interface Props {
   item: Job;
-  isSelected?: boolean;
 }
 
-export function Card({ item, isSelected }: Props) {
-  const location = useLocation();
+function getTruncatedTextFromHTML(html: string = "", maxChars: number = 100) {
+  if (!html.trim()) return ""
+
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(html, 'text/html')
+  let text = doc.body.textContent?.trim() || ""
+  return text.length > maxChars ? text.slice(0, maxChars).trimEnd() + "..." : text
+}
+
+export function Card({ item }: Props) {
+  const {pathname, search} = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const savedJobs = useAppSelector((state) => state.savedJobs.savedJobs);
@@ -20,24 +31,25 @@ export function Card({ item, isSelected }: Props) {
   function handleSaveToggle(e: React.MouseEvent) {
     e.stopPropagation();
     e.preventDefault();
-    if (isSaved) {
-      dispatch(removeSavedJob({ id: item.id }));
-    } else {
-      dispatch(addSavedJob(item));
-    }
+    dispatch(isSaved ? removeSavedJob({ id: item.id }) : dispatch(addSavedJob(item)));
   }
 
   function handleClick() {
-    const currentPathname = location.pathname;
-    const searchParams = new URLSearchParams(location.search);
-    searchParams.set("jobId", item.id);
-    navigate(`${currentPathname}?${searchParams.toString()}`);
+    const params = new URLSearchParams(search);
+    params.set("jobId", item.id);
+    navigate(`${pathname}?${params.toString()}`);
   }
 
+  const tags = [
+    { label: `Modalidad: ${item.isRemote ? "En casa" : "En oficina"}` },
+    { label: `Empresa: ${item.companyName}` },
+    { label: `Sueldo: ${item.salaryRange}` }
+  ];
+  console.log(getTruncatedTextFromHTML(item.jobDescription))
   return (
     <article
       onClick={handleClick}
-      className={`relative cursor-pointer transform transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-2 flex flex-col gap-2 rounded-xl w-full ${isSelected ? "bg-neutral-900 border-neutral-700 border-[1px]" : "border-neutral-800"} xl:outline xl:outline-neutral-900 p-4`}
+      className={`relative cursor-pointer hover:bg-neutral-800 flex flex-col justify-between gap-2 w-full min-h-56 h-full p-3`}
       aria-labelledby={`job-title-${item.id}`}
       role="region"
       data-testid={`job-card-${item.id}`}
@@ -54,7 +66,7 @@ export function Card({ item, isSelected }: Props) {
           </h2>
           <div className="flex items-center gap-1">
             <h3 className="text-sm text-gray-400">{item.companyName}</h3>
-            <span className="text-gray-500">&#9679;</span>
+            <span className="text-gray-500 text-[0.60em]">&#9679;</span>
             <h3 className="text-sm text-gray-400">{item.jobLocation}</h3>
           </div>
         </div>
@@ -76,31 +88,30 @@ export function Card({ item, isSelected }: Props) {
         </button>
       </header>
 
-      <div role="group" aria-label="Etiquetas del empleo" className="mt-2">
+      <div role="group" aria-label="Etiquetas del empleo">
         <ul
-          className="flex flex-wrap gap-2"
+          className="flex flex-wrap items-center justify-items-start gap-2"
           data-testid={`job-tags-${item.id}`}
         >
-          <li>
-            <Chip label={item.isRemote ? "Desde casa" : "En oficina"} />
-          </li>
-          <li>
-            <Chip label={item.employmentType} />
-          </li>
+          {tags.map(tag => (
+            <li key={`tagId-${tag.label}`}>
+              <Chip label={tag.label} />
+            </li>
+          ))}
         </ul>
       </div>
 
       {item.jobDescription && (
-        <p
-          className="text-sm text-gray-300 tracking-wide"
-          data-testid={`job-description-${item.id}`}
+        <div
+          className={`text-sm text-gray-300 tracking-wide`}
+          data-description={`job-description-${item.id}`}
+          dangerouslySetInnerHTML={{__html: sanitizeHTML(getTruncatedTextFromHTML(item.jobDescription))}}
         >
-          {item.jobDescription}
-        </p>
+        </div>
       )}
 
       <footer className="flex justify-between text-sm text-gray-400 font-light">
-        <label>{item.datePosted}</label>
+        <label>{timeAgo(item.datePosted)}</label>
       </footer>
     </article>
   );

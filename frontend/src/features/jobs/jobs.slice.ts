@@ -29,7 +29,7 @@ export const jobsSlice = createSlice({
     })
     .addCase(fetchJobs.fulfilled, (state, action: PayloadAction<Job[]>) => {
       state.status = 'succeeded'
-      console.log("case: fetchJobs.fulfilled{", action.payload,"}")
+      // console.log("case: fetchJobs.fulfilled{", action.payload,"}")
       state.jobs = action.payload
     })
     .addCase(fetchJobs.rejected, (state, action) => {

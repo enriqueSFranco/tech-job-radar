@@ -6,9 +6,10 @@ import { NoJobsFound } from "@/views/jobs/not-found";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { selectJobsStatus } from "../../jobs.selectors";
 import { ErrorMessage } from "@/ui/atoms/ErrorMessage";
-import { selectFormSearch } from "@/features/search/search.selectors";
+import { selectFormSearch } from "@/features/job-search/search.selectors";
 import { fetchJobs } from "../../jobs.thunks";
 import { useLocation, useNavigate } from "react-router";
+import styles from "./JobList.module.css"
 
 interface Props {
   jobs: Job[];
@@ -54,23 +55,22 @@ export function JobList({ jobs }: Props) {
     return <NoJobsFound keyword={keyword} location={location} />;
 
   return (
-    <div data-testid="job-list-container" className="col-span-5">
       <ul
         aria-label="Lista de empleos disponibles"
         role="list"
         data-testid="job-list"
-        className="grid columns-lg gap-y-5"
+        className={`grid columns-lg space-y-1 w-full ${styles.job_list}`}
       >
         {jobs.map((job) => (
           <li
             key={`jobId-${job.id}`}
             data-testid={`job-job-${job.id}`}
             onClick={() => setSelectedCardJob({ id: job.id })}
+            className={`overflow-hidden m-0 ${selectedCardJob?.id === job.id ? styles.selected : ""}`}
           >
-            <Card item={job} isSelected={selectedCardJob?.id === job.id} />
+            <Card item={job} />
           </li>
         ))}
       </ul>
-    </div>
   );
 }

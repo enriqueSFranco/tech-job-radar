@@ -19,21 +19,19 @@ export const handlers = [
     }
     if (!keyword.includes("frontend developer") &&
     !location.includes("ciudad de mexico")) {
-      return HttpResponse.json([{
-        "id": "1",
-        "jobTitle": "Data Scientist",
-        "companyName": "InsightAI",
-        "jobLocation": "Barcelona, Spain",
-        "isRemote": false,
-        "jobDescription": "Analyze large datasets to provide business insights.",
-        "employmentType": "Full-Time",
-        "datePosted": "2025-04-10",
-        "techStack": ["Python", "Pandas", "TensorFlow", "SQL"],
-        "experienceLevel": "Senior",
-        "educationRequirements": "Master’s in Data Science",
-        "applicationUrl": "https://www.glassdoor.com.mx/careers/data-scientist",
-        "salaryRange": "€50,000 - €70,000"
-      }]);
+      return HttpResponse.json({
+        data: mockData,
+        pagination: {
+          total_items: 10,
+          current_page: 1,
+          total_pages: 1,
+          items_per_page: 20,
+        },
+        links: {
+          self: ``,
+          next_page: ``
+        }
+      });
     }
 
     if (keyword.trim() === "") return;

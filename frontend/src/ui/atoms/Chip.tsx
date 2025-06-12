@@ -9,16 +9,14 @@ interface Props {
 
 export function Chip({ label, children }: Props) {
   const defaultStyles: React.CSSProperties = {
-    backgroundColor: "#6B728033",
-    color: "#fff",
-  }
-  const defaultTextStyle: React.CSSProperties = {
+    backgroundColor: "#262626",
     color: "#9CA3AF",
   }
+
   return (
-    <div style={{...defaultStyles}} className="flex items-center gap-1.5 px-2 py-1 rounded-full">
+    <div className="flex flex-col items-start gap-1.5 rounded-full">
       {children}
-      <h3  style={{...defaultTextStyle}} className="text-sm self-end">{label}</h3>
+      <span  style={{...defaultStyles}} className="text-sm self-start rounded-sm px-2 py-0.5">{label}</span>
     </div>
   );
 }
